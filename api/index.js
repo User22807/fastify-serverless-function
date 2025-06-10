@@ -3,19 +3,18 @@ import Fastify from 'fastify'
 const app = Fastify({
   logger: true,
 })
-
+curl -X GET http://localhost:3000/
 // Fetch data from the external API
 async function fetchData() {
   const response = await fetch('https://meta-test.rasa.capital/mock-api/markets', {
-    method: 'POST',
+    method: 'GET', // Use GET as per the curl template
     headers: {
-      'Content-Type': 'application/json',
+      'accept': 'application/json', // Set the 'accept' header as specified in the curl template
     },
-    body: JSON.stringify({ key: 'value' }) // Replace with the actual payload if needed
   })
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch data: ${response.statusText}`)
+    throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`)
   }
 
   return response.json()
@@ -27,7 +26,7 @@ app.get('/', async (req, reply) => {
     return reply.status(200).type('application/json').send(data)
   } catch (error) {
     app.log.error(error)
-    return reply.status(500).send({ error: 'Failed to fetch data' })
+    return reply.status(500).send({ error: 'Failed to fetch data', details: error.message })
   }
 })
 
