@@ -3,7 +3,7 @@ import Fastify from 'fastify'
 const app = Fastify({
   logger: true,
 })
-curl -X GET http://localhost:3000/
+
 // Fetch data from the external API
 async function fetchData() {
   const response = await fetch('https://meta-test.rasa.capital/mock-api/markets', {
