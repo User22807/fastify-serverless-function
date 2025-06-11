@@ -9,6 +9,7 @@ app.use(cors());
 app.use(express.json());
 
 const BASE_URL = "https://meta-test.rasa.capital/mock-api";
+const REAL_URL = "https://meta-test.rasa.capital";
 const BASE_WS_URL = "wss://meta-test.rasa.capital/mock-api/ws";
 
 app.get("/api/ohlcv", async (req, res) => {
@@ -24,7 +25,7 @@ app.get("/api/ohlcv", async (req, res) => {
 app.get("/api/orderbooks", async (req, res) => {
   const { symbol, limit } = req.query;
   try {
-    const response = await fetch(`${BASE_URL}/orderbook?symbol=${symbol}&limit=${limit}`);
+    const response = await fetch(`${REAL_URL}/orderbook?symbol=${symbol}&limit=${limit}`);
     res.json(await response.json());
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch orderbook data" });
@@ -53,7 +54,7 @@ app.get("/api/markets", async (req, res) => {
 app.get("/api/balance", async (req, res) => {
   try {
     const authHeader = req.headers["authorization"];
-    const response = await fetch(`https://meta-test.rasa.capital/mock-api/balance`, {
+    const response = await fetch(`${REAL_URL}/balance`, {
       method: "GET",
       headers: {
         accept: "application/json",
@@ -69,7 +70,7 @@ app.get("/api/balance", async (req, res) => {
 
 app.post("/api/create_user", async (req, res) => {
   const { username, password } = req.query;
-  const url = `${BASE_URL}/create_user?username=${username}&password=${password}`;
+  const url = `${REAL_URL}/create_user?username=${username}&password=${password}`;
   const response = await fetch(url, { method: "POST" });
   res.json(await response.json());
 });
@@ -77,7 +78,7 @@ app.post("/api/create_user", async (req, res) => {
 app.post("/api/token", async (req, res) => {
   const { username, password } = req.query;
   const body = `username=${username}&password=${password}`;
-  const response = await fetch(`${BASE_URL}/token`, {
+  const response = await fetch(`${REAL_URL}/token`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body,
@@ -101,7 +102,7 @@ app.post("/api/change_password", async (req, res) => {
   const signature = crypto.createHmac("sha256", old_password).update(signaturePayload).digest("hex");
 
   // Build the URL with old_password as query param
-  const url = `${BASE_URL}/change_password?password=${encodeURIComponent(old_password)}`;
+  const url = `${REAL_URL}/change_password?password=${encodeURIComponent(old_password)}`;
 
   console.log("nonce:", nonce);
   console.log("payload:", signaturePayload);
