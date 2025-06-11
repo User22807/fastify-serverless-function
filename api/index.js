@@ -26,6 +26,7 @@ async function fetchData() {
   return response.json();
 }
 
+// Define the Fastify route
 app.get('/', async (req, reply) => {
   try {
     const data = await fetchData();
@@ -36,7 +37,8 @@ app.get('/', async (req, reply) => {
   }
 });
 
-export default async function handler(req, reply) {
+// Export the handler for Vercel
+export default async function handler(req, res) {
   await app.ready();
-  app.server.emit('request', req, reply);
+  app.server.emit('request', req, res);
 }
