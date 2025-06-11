@@ -1,14 +1,19 @@
 {
-  "name": "fastify",
-  "repository": "https://github.com/vercel/examples.git",
-  "license": "MIT",
-  "private": true,
-  "type": "module",
-  "dependencies": {
-    "@fastify/cors": "^11.0.1",
-    "fastify": "^4.25.2"
-  },
+  "name": "proxy-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "start": "node api/index.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "express-ws": "^5.0.2",
+    "node-fetch": "^3.3.2"
   }
 }
