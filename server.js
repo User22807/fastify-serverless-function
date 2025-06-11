@@ -10,6 +10,7 @@ app.use(express.json());
 
 const BASE_URL = "https://meta-test.rasa.capital/mock-api";
 const REAL_URL = "https://meta-test.rasa.capital";
+
 const BASE_WS_URL = "wss://meta-test.rasa.capital/mock-api/ws";
 
 app.get("/api/ohlcv", async (req, res) => {
@@ -25,7 +26,7 @@ app.get("/api/ohlcv", async (req, res) => {
 app.get("/api/orderbooks", async (req, res) => {
   const { symbol, limit } = req.query;
   try {
-    const response = await fetch(`${REAL_URL}/orderbook?symbol=${symbol}&limit=${limit}`);
+    const response = await fetch(`${BASE_URL}/orderbook?symbol=${symbol}&limit=${limit}`);
     res.json(await response.json());
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch orderbook data" });
@@ -215,13 +216,43 @@ app.post("/api/leverage", async (req, res) => {
   }
 });
 
+app.post("/api/order", async (req, res) => {
+  try {
+    const authHeader = req.headers["authorization"]; // JWT token
+    const orderData = req.body; // Order payload
+
+    // Forward the order to the real API
+    const response = await fetch("https://meta-test.rasa.capital/order", {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: authHeader, // Forward the token
+      },
+      body: JSON.stringify(orderData), // Forward the order payload
+    });
+
+    // Get the raw response text
+    const rawResponse = await response.text();
+
+    // Log the raw response for debugging
+    console.log("Raw API Response:", rawResponse);
+
+    // Return the raw response to the client
+    res.status(response.status).send(rawResponse);
+  } catch (err) {
+    console.error("Error placing order:", err);
+    res.status(500).json({ error: "Failed to place order" });
+  }
+});
+
 app.listen(3001, () => console.log("Proxy server running on http://localhost:3001"));
 
 // WebSocket Proxy
 const wss = new WebSocket.Server({ port: 3002 });
 
 wss.on("connection", (clientSocket, req) => {
-  console.log("Client connected to WebSocket proxy.");
+  //console.log("Client connected to WebSocket proxy.");
 
   const urlParams = new URLSearchParams(req.url.split("?")[1]);
   const symbol = urlParams.get("symbol") || "BTCUSDT";
@@ -232,11 +263,10 @@ wss.on("connection", (clientSocket, req) => {
     if (targetSocket) {
       targetSocket.close(); // Close the previous connection if it exists
     }
-
     targetSocket = new WebSocket(`wss://meta-test.rasa.capital/ws/orderbook/${symbol}`);
 
     targetSocket.on("open", () => {
-      console.log(`Connected to SYMMIO WebSocket for ${symbol}`);
+      //console.log(`Connected to SYMMIO WebSocket for ${symbol}`);
     });
 
     targetSocket.on("message", (data) => {
@@ -244,22 +274,22 @@ wss.on("connection", (clientSocket, req) => {
     });
 
     targetSocket.on("close", () => {
-      console.log(`SYMMIO WebSocket for ${symbol} closed.`);
+      //console.log(`SYMMIO WebSocket for ${symbol} closed.`);
       setTimeout(connectToSymmioWebSocket, 3000); // Retry connection after 3 seconds
     });
 
     targetSocket.on("error", (error) => {
-      console.error("Error in SYMMIO WebSocket:", error);
+      //console.error("Error in SYMMIO WebSocket:", error);
       setTimeout(connectToSymmioWebSocket, 3000); // Retry connection after 3 seconds
     });
 
     clientSocket.on("close", () => {
-      console.log("Client WebSocket connection closed.");
+      //console.log("Client WebSocket connection closed.");
       targetSocket.close();
     });
 
     clientSocket.on("error", (error) => {
-      console.error("Error in client WebSocket:", error);
+      //console.error("Error in client WebSocket:", error);
       targetSocket.close();
     });
   };
