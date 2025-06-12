@@ -1,8 +1,7 @@
-// Updated server.js
-const express = require("express");
-const cors = require("cors");
-const crypto = require("crypto");
-const WebSocket = require("ws");
+import express from "express";
+import cors from "cors";
+import crypto from "crypto";
+import http from "http";
 
 const app = express();
 app.use(cors());
@@ -11,8 +10,7 @@ app.use(express.json());
 const BASE_URL = "https://meta-test.rasa.capital/mock-api";
 const REAL_URL = "https://meta-test.rasa.capital";
 
-const BASE_WS_URL = "wss://meta-test.rasa.capital/mock-api/ws";
-
+// REST API routes
 app.get("/api/ohlcv", async (req, res) => {
   const { symbol = "BTCUSDT", timeframe = 100, limit = 100 } = req.query;
   try {
@@ -232,69 +230,36 @@ app.post("/api/order", async (req, res) => {
       body: JSON.stringify(orderData), // Forward the order payload
     });
 
-    // Get the raw response text
-    const rawResponse = await response.text();
-
-    // Log the raw response for debugging
-    console.log("Raw API Response:", rawResponse);
-
-    // Return the raw response to the client
-    res.status(response.status).send(rawResponse);
+    const data = await response.json();
+    res.status(response.status).json(data); // Return the response to the client
   } catch (err) {
     console.error("Error placing order:", err);
     res.status(500).json({ error: "Failed to place order" });
   }
 });
 
-app.listen(3001, () => console.log("Proxy server running on http://localhost:3001"));
-
-// WebSocket Proxy
-const wss = new WebSocket.Server({ port: 3002 });
-
-wss.on("connection", (clientSocket, req) => {
-  //console.log("Client connected to WebSocket proxy.");
-
-  const urlParams = new URLSearchParams(req.url.split("?")[1]);
-  const symbol = urlParams.get("symbol") || "BTCUSDT";
-
-  let targetSocket;
-
-  const connectToSymmioWebSocket = () => {
-    if (targetSocket) {
-      targetSocket.close(); // Close the previous connection if it exists
-    }
-    targetSocket = new WebSocket(`wss://meta-test.rasa.capital/ws/orderbook/${symbol}`);
-
-    targetSocket.on("open", () => {
-      //console.log(`Connected to SYMMIO WebSocket for ${symbol}`);
+app.get("/api/trades", async (req, res) => {
+  const { symbol = "BTCUSDT", limit = 100 } = req.query; // Default values for symbol and limit
+  try {
+    const response = await fetch(`${REAL_URL}/trades?symbol=${symbol}&limit=${limit}`, {
+      method: "GET",
+      headers: {
+        accept: "application/json", // Set the required header
+      },
     });
-
-    targetSocket.on("message", (data) => {
-      clientSocket.send(data); // Forward data to the client
-    });
-
-    targetSocket.on("close", () => {
-      //console.log(`SYMMIO WebSocket for ${symbol} closed.`);
-      setTimeout(connectToSymmioWebSocket, 3000); // Retry connection after 3 seconds
-    });
-
-    targetSocket.on("error", (error) => {
-      //console.error("Error in SYMMIO WebSocket:", error);
-      setTimeout(connectToSymmioWebSocket, 3000); // Retry connection after 3 seconds
-    });
-
-    clientSocket.on("close", () => {
-      //console.log("Client WebSocket connection closed.");
-      targetSocket.close();
-    });
-
-    clientSocket.on("error", (error) => {
-      //console.error("Error in client WebSocket:", error);
-      targetSocket.close();
-    });
-  };
-
-  connectToSymmioWebSocket();
+    const data = await response.json();
+    res.json(data); // Send the fetched data back to the client
+  } catch (err) {
+    console.error("Error fetching trades:", err);
+    res.status(500).json({ error: "Failed to fetch trades" });
+  }
 });
 
-console.log("WebSocket proxy server running on ws://localhost:3002");
+// Create an HTTP server
+const server = http.createServer(app);
+
+
+// Start the HTTP server
+server.listen(3001, () => {
+  console.log("Proxy server running on http://localhost:3001");
+});
