@@ -26,7 +26,7 @@ app.get("/api/ohlcv", async (req, res) => {
 app.get("/api/orderbooks", async (req, res) => {
   const { symbol, limit } = req.query;
   try {
-    const response = await fetch(`${BASE_URL}/orderbook?symbol=${symbol}&limit=${limit}`);
+    const response = await fetch(`${REAL_URL}/orderbook?symbol=${symbol}&limit=${limit}`);
     res.json(await response.json());
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch orderbook data" });
