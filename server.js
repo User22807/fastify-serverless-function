@@ -1,7 +1,7 @@
-import express from "express";
-import cors from "cors";
-import crypto from "crypto";
-import http from "http";
+const express = require("express");
+const cors = require("cors");
+const crypto = require("crypto");
+const http = require("http");
 
 const app = express();
 app.use(cors());
