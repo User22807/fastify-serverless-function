@@ -171,6 +171,30 @@ app.get("/api/account-information", async (req, res) => {
   }
 });
 
+app.get("/api/account-information-direct", async (req, res) => {
+  try {
+    const authHeader = req.headers["authorization"]; // Extract the Authorization header
+
+    if (!authHeader) {
+      return res.status(400).json({ error: "Missing Authorization header" });
+    }
+
+    const response = await fetch("https://meta-test.rasa.capital/account-information", {
+      method: "GET",
+      headers: {
+        accept: "application/json",
+        Authorization: authHeader, // Forward the token
+      },
+    });
+
+    const data = await response.json();
+    res.status(response.status).json(data); // Return the response to the client
+  } catch (err) {
+    console.error("Error fetching account information:", err);
+    res.status(500).json({ error: "Failed to fetch account information" });
+  }
+});
+
 app.get("/api/positions", async (req, res) => {
   try {
     const authHeader = req.headers["authorization"];
