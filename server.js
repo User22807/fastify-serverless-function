@@ -7,7 +7,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const BASE_URL = "https://meta-test.rasa.capital/mock-api";
+const BASE_URL = "https://superflow.exchange";
 
 // REST API routes
 app.get("/api/ohlcv", async (req, res) => {
