@@ -220,7 +220,12 @@ app.post("/api/leverage", async (req, res) => {
     const authHeader = req.headers["authorization"];
     const { symbol, leverage } = req.body;
 
-    const response = await fetch("https://meta-test.rasa.capital/mock-api/leverage", {
+
+
+    // Log the outgoing request for debugging
+    console.log("Sending leverage request:", { symbol, leverage });
+
+    const response = await fetch("https://superflow.exchange/leverage", {
       method: "POST",
       headers: {
         accept: "application/json",
@@ -231,6 +236,7 @@ app.post("/api/leverage", async (req, res) => {
     });
 
     const data = await response.json();
+
     res.status(response.status).json(data);
   } catch (err) {
     res.status(500).json({ error: "Failed to set leverage" });
