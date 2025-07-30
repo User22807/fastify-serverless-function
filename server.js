@@ -284,6 +284,28 @@ app.post("/api/margin-mode", async (req, res) => {
   }
 });
 
+app.get("/api/open-orders", async (req, res) => {
+  try {
+    const authHeader = req.headers["authorization"];
+    if (!authHeader) {
+      return res.status(400).json({ error: "Missing Authorization header" });
+    }
+
+    const response = await fetch("https://superflow.exchange/orders/open", {
+      method: "GET",
+      headers: {
+        accept: "application/json",
+        Authorization: authHeader,
+      },
+    });
+
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch open orders" });
+  }
+});
+
 // Create an HTTP server
 const server = http.createServer(app);
 
