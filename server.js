@@ -218,7 +218,7 @@ app.post("/api/order", async (req, res) => {
     const orderData = req.body; // Order payload
 
     // Forward the order to the real API
-    const response = await fetch("https://meta-test.rasa.capital/order", {
+    const response = await fetch("https://superflow.exchange/order", {
       method: "POST",
       headers: {
         accept: "application/json",
