@@ -147,7 +147,7 @@ app.get("/api/account-information", async (req, res) => {
     }
 
     const response = await fetch(
-      `${BASE_URL}/account-information`,
+      "https://superflow.exchange/account-information",
       {
         method: "GET",
         headers: {
@@ -170,7 +170,7 @@ app.get("/api/positions", async (req, res) => {
     const authHeader = req.headers["authorization"];
     const { limit = 20 } = req.query;
     const response = await fetch(
-      `${BASE_URL}/positions?limit=${limit}`,
+      `https://superflow.exchange/positions?limit=${limit}`,
       {
         method: "GET",
         headers: {
@@ -194,7 +194,7 @@ app.post("/api/leverage", async (req, res) => {
     // Log the outgoing request for debugging
     console.log("Sending leverage request:", { symbol, leverage });
 
-    const response = await fetch(`${BASE_URL}/leverage`, {
+    const response = await fetch("https://superflow.exchange/leverage", {
       method: "POST",
       headers: {
         accept: "application/json",
@@ -212,31 +212,24 @@ app.post("/api/leverage", async (req, res) => {
   }
 });
 
-app.post("/api/place-order", async (req, res) => {
+app.post("/api/order", async (req, res) => {
   try {
-    const authHeader = req.headers["authorization"];
-    if (!authHeader) {
-      return res.status(400).json({ error: "Missing Authorization header" });
-    }
+    const authHeader = req.headers["authorization"]; // JWT token
+    const orderData = req.body; // Order payload
 
-    const orderBody = req.body;
-
-    // Log the outgoing order for debugging
-    console.log("Placing order:", orderBody);
-
-    const response = await fetch(`${BASE_URL}/order`, {
+    // Forward the order to the real API
+    const response = await fetch("https://superflow.exchange/order", {
       method: "POST",
       headers: {
         accept: "application/json",
         "Content-Type": "application/json",
-        Authorization: authHeader,
+        Authorization: authHeader, // Forward the token
       },
-      body: JSON.stringify(orderBody),
+      body: JSON.stringify(orderData), // Forward the order payload
     });
 
     const data = await response.json();
-
-    res.status(response.status).json(data);
+    res.status(response.status).json(data); // Return the response to the client
   } catch (err) {
     console.error("Error placing order:", err);
     res.status(500).json({ error: "Failed to place order" });
@@ -274,7 +267,7 @@ app.post("/api/margin-mode", async (req, res) => {
         .json({ error: "Missing auth, symbol, or marginMode" });
     }
 
-    const response = await fetch(`${BASE_URL}/margin-mode`, {
+    const response = await fetch("https://superflow.exchange/margin-mode", {
       method: "POST",
       headers: {
         accept: "application/json",
@@ -298,7 +291,7 @@ app.get("/api/open-orders", async (req, res) => {
       return res.status(400).json({ error: "Missing Authorization header" });
     }
 
-    const response = await fetch(`${BASE_URL}/orders/open`, {
+    const response = await fetch("https://superflow.exchange/orders/open", {
       method: "GET",
       headers: {
         accept: "application/json",
@@ -322,7 +315,7 @@ app.post("/api/position-mode", async (req, res) => {
       return res.status(400).json({ error: "Missing Authorization header or mode" });
     }
 
-    const response = await fetch(`${BASE_URL}/position-mode`, {
+    const response = await fetch("https://superflow.exchange/position-mode", {
       method: "POST",
       headers: {
         accept: "application/json",
