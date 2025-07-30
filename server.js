@@ -306,6 +306,32 @@ app.get("/api/open-orders", async (req, res) => {
   }
 });
 
+app.post("/api/position-mode", async (req, res) => {
+  try {
+    const authHeader = req.headers["authorization"];
+    const { mode } = req.body;
+
+    if (!authHeader || !mode) {
+      return res.status(400).json({ error: "Missing Authorization header or mode" });
+    }
+
+    const response = await fetch("https://superflow.exchange/position-mode", {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: authHeader,
+      },
+      body: JSON.stringify({ mode }),
+    });
+
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to set position mode" });
+  }
+});
+
 // Create an HTTP server
 const server = http.createServer(app);
 
