@@ -332,6 +332,30 @@ app.post("/api/position-mode", async (req, res) => {
   }
 });
 
+app.get("/api/current-position", async (req, res) => {
+  try {
+    const authHeader = req.headers["authorization"];
+    const { symbol = "BTCUSDT" } = req.query;
+
+    if (!authHeader) {
+      return res.status(400).json({ error: "Missing Authorization header" });
+    }
+
+    const response = await fetch(`https://superflow.exchange/position?symbol=${encodeURIComponent(symbol)}`, {
+      method: "GET",
+      headers: {
+        accept: "application/json",
+        Authorization: authHeader,
+      },
+    });
+
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch current position" });
+  }
+});
+
 // Create an HTTP server
 const server = http.createServer(app);
 
