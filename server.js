@@ -214,30 +214,22 @@ app.post("/api/leverage", async (req, res) => {
 
 app.post("/api/order", async (req, res) => {
   try {
-    const authHeader = req.headers["authorization"];
-    const orderData = req.body;
+    const authHeader = req.headers["authorization"]; // JWT token
+    const orderData = req.body; // Order payload
 
+    // Forward the order to the real API
     const response = await fetch("https://superflow.exchange/order", {
       method: "POST",
       headers: {
         accept: "application/json",
         "Content-Type": "application/json",
-        Authorization: authHeader,
+        Authorization: authHeader, // Forward the token
       },
-      body: JSON.stringify(orderData),
+      body: JSON.stringify(orderData), // Forward the order payload
     });
 
-    const contentType = response.headers.get("content-type");
-    let data;
-    if (contentType && contentType.includes("application/json")) {
-      data = await response.json();
-    } else {
-      data = await response.text();
-    }
-
-    res.status(response.status).json(
-      typeof data === "object" ? data : { error: data }
-    );
+    const data = await response.json();
+    res.status(response.status).json(data); // Return the response to the client
   } catch (err) {
     console.error("Error placing order:", err);
     res.status(500).json({ error: "Failed to place order" });
