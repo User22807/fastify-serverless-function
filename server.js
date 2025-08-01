@@ -140,28 +140,26 @@ app.post("/api/change_password", async (req, res) => {
 
 app.get("/api/account-information", async (req, res) => {
   try {
-    const authHeader = req.headers["authorization"]; // Extract the Authorization header
-
+    const authHeader = req.headers["authorization"];
     if (!authHeader) {
       return res.status(400).json({ error: "Missing Authorization header" });
     }
-
     const response = await fetch(
-      "${BASE_URL}/account-information",
+      `${BASE_URL}/account-information`,
       {
         method: "GET",
         headers: {
           accept: "application/json",
-          Authorization: authHeader, // Forward the token
+          Authorization: authHeader,
         },
       }
     );
-
     const data = await response.json();
-    res.status(response.status).json(data); // Return the response to the client
+    res.status(response.status).json(data);
   } catch (err) {
     console.error("Error fetching account information:", err);
-    res.status(500).json({ error: "Failed to fetch account information" });
+    //res.status(500).json({ error: "Failed to fetch account information" });
+    res.status(500).end();
   }
 });
 
