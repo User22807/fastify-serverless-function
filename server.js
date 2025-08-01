@@ -140,26 +140,28 @@ app.post("/api/change_password", async (req, res) => {
 
 app.get("/api/account-information", async (req, res) => {
   try {
-    const authHeader = req.headers["authorization"];
+    const authHeader = req.headers["authorization"]; // Extract the Authorization header
+
     if (!authHeader) {
       return res.status(400).json({ error: "Missing Authorization header" });
     }
+
     const response = await fetch(
-      `${BASE_URL}/account-information`,
+      "https://superflow.exchange/account-information",
       {
         method: "GET",
         headers: {
           accept: "application/json",
-          Authorization: authHeader,
+          Authorization: authHeader, // Forward the token
         },
       }
     );
+
     const data = await response.json();
-    res.status(response.status).json(data);
+    res.status(response.status).json(data); // Return the response to the client
   } catch (err) {
     console.error("Error fetching account information:", err);
-    //res.status(500).json({ error: "Failed to fetch account information" });
-    res.status(500).end();
+    res.status(500).json({ error: "Failed to fetch account information" });
   }
 });
 
@@ -168,7 +170,7 @@ app.get("/api/positions", async (req, res) => {
     const authHeader = req.headers["authorization"];
     const { limit = 20 } = req.query;
     const response = await fetch(
-      `${BASE_URL}/positions?limit=${limit}`,
+      `https://superflow.exchange/positions?limit=${limit}`,
       {
         method: "GET",
         headers: {
@@ -192,7 +194,7 @@ app.post("/api/leverage", async (req, res) => {
     // Log the outgoing request for debugging
     console.log("Sending leverage request:", { symbol, leverage });
 
-    const response = await fetch("${BASE_URL}/leverage", {
+    const response = await fetch("https://superflow.exchange/leverage", {
       method: "POST",
       headers: {
         accept: "application/json",
@@ -216,7 +218,7 @@ app.post("/api/order", async (req, res) => {
     const orderData = req.body; // Order payload
 
     // Forward the order to the real API
-    const response = await fetch("${BASE_URL}/order", {
+    const response = await fetch("https://superflow.exchange/order", {
       method: "POST",
       headers: {
         accept: "application/json",
@@ -265,7 +267,7 @@ app.post("/api/margin-mode", async (req, res) => {
         .json({ error: "Missing auth, symbol, or marginMode" });
     }
 
-    const response = await fetch("${BASE_URL}/margin-mode", {
+    const response = await fetch("https://superflow.exchange/margin-mode", {
       method: "POST",
       headers: {
         accept: "application/json",
@@ -289,7 +291,7 @@ app.get("/api/open-orders", async (req, res) => {
       return res.status(400).json({ error: "Missing Authorization header" });
     }
 
-    const response = await fetch("${BASE_URL}/orders/open", {
+    const response = await fetch("https://superflow.exchange/orders/open", {
       method: "GET",
       headers: {
         accept: "application/json",
@@ -313,7 +315,7 @@ app.post("/api/position-mode", async (req, res) => {
       return res.status(400).json({ error: "Missing Authorization header or mode" });
     }
 
-    const response = await fetch("${BASE_URL}/position-mode", {
+    const response = await fetch("https://superflow.exchange/position-mode", {
       method: "POST",
       headers: {
         accept: "application/json",
@@ -339,7 +341,7 @@ app.get("/api/current-position", async (req, res) => {
       return res.status(400).json({ error: "Missing Authorization header" });
     }
 
-    const response = await fetch(`${BASE_URL}/position?symbol=${encodeURIComponent(symbol)}`, {
+    const response = await fetch(`https://superflow.exchange/position?symbol=${encodeURIComponent(symbol)}`, {
       method: "GET",
       headers: {
         accept: "application/json",
@@ -364,7 +366,7 @@ app.delete("/api/cancel-order", async (req, res) => {
     }
 
     const response = await fetch(
-      `${BASE_URL}/order?id=${encodeURIComponent(id)}&symbol=${encodeURIComponent(symbol)}`,
+      `https://superflow.exchange/order?id=${encodeURIComponent(id)}&symbol=${encodeURIComponent(symbol)}`,
       {
         method: "DELETE",
         headers: {
