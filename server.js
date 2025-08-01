@@ -356,6 +356,33 @@ app.get("/api/current-position", async (req, res) => {
   }
 });
 
+app.delete("/api/cancel-order", async (req, res) => {
+  try {
+    const authHeader = req.headers["authorization"];
+    const { id, symbol } = req.query;
+
+    if (!id || !symbol) {
+      return res.status(400).json({ error: "Missing order id or symbol" });
+    }
+
+    const response = await fetch(
+      `https://superflow.exchange/order?id=${encodeURIComponent(id)}&symbol=${encodeURIComponent(symbol)}`,
+      {
+        method: "DELETE",
+        headers: {
+          accept: "application/json",
+          Authorization: authHeader,
+        },
+      }
+    );
+
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to cancel order" });
+  }
+});
+
 // Create an HTTP server
 const server = http.createServer(app);
 
