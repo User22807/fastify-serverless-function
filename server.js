@@ -6,6 +6,7 @@ const http = require("http");
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // Add this at the top, after express.json()
 
 const BASE_URL = "https://superflow.exchange";
 
@@ -78,7 +79,7 @@ app.post("/api/create_user", async (req, res) => {
 });
 
 app.post("/api/token", async (req, res) => {
-  const { username, password } = req.query;
+  const { username, password } = req.body; // <-- Use req.body for form data
   const body = `username=${username}&password=${password}`;
   const response = await fetch(`${BASE_URL}/token`, {
     method: "POST",
