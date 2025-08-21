@@ -384,6 +384,49 @@ app.delete("/api/cancel-order", async (req, res) => {
   }
 });
 
+app.post("/api/modify-isolated-balance", async (req, res) => {
+  try {
+    const authHeader = req.headers["authorization"];
+    const { action } = req.query; // 'deposit' or 'withdraw'
+    const { symbol, positionSide, amount } = req.body;
+
+    if (!authHeader || !action || !symbol || !amount) {
+      return res.status(400).json({ 
+        error: "Missing required parameters: authHeader, action, symbol, or amount" 
+      });
+    }
+
+    if (action !== 'deposit' && action !== 'withdraw') {
+      return res.status(400).json({ 
+        error: "Action must be either 'deposit' or 'withdraw'" 
+      });
+    }
+
+    const response = await fetch(
+      `https://superflow.exchange/modify-isolated-balance?action=${action}`,
+      {
+        method: "POST",
+        headers: {
+          accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: authHeader,
+        },
+        body: JSON.stringify({
+          symbol,
+          positionSide: positionSide || "BOTH",
+          amount
+        }),
+      }
+    );
+
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (err) {
+    console.error("Error modifying isolated balance:", err);
+    res.status(500).json({ error: "Failed to modify isolated balance" });
+  }
+});
+
 // Create an HTTP server
 const server = http.createServer(app);
 
