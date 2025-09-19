@@ -72,21 +72,47 @@ app.get("/api/balance", async (req, res) => {
 });
 
 app.post("/api/create_user", async (req, res) => {
-  const { username, password } = req.query;
-  const url = `${BASE_URL}/create_user?username=${username}&password=${password}`;
-  const response = await fetch(url, { method: "POST" });
-  res.json(await response.json());
+  const { username, password } = req.body;
+  try {
+    const response = await fetch(`${BASE_URL}/create-user`, {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, password }),
+    });
+    res.status(response.status).json(await response.json());
+  } catch (err) {
+    res.status(500).json({ error: "Failed to create user" });
+  }
 });
 
 app.post("/api/token", async (req, res) => {
-  const { username, password } = req.body; // <-- Use req.body for form data
-  const body = `username=${username}&password=${password}`;
-  const response = await fetch(`${BASE_URL}/token`, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body,
-  });
-  res.json(await response.json());
+  const {
+    username,
+    password,
+    scope = "",
+    client_id = "string",
+    client_secret = "********",
+    grant_type = "password"
+  } = req.body;
+
+  const body = `grant_type=${encodeURIComponent(grant_type)}&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}&scope=${encodeURIComponent(scope)}&client_id=${encodeURIComponent(client_id)}&client_secret=${encodeURIComponent(client_secret)}`;
+
+  try {
+    const response = await fetch(`${BASE_URL}/token`, {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body,
+    });
+    res.status(response.status).json(await response.json());
+  } catch (err) {
+    res.status(500).json({ error: "Failed to login" });
+  }
 });
 
 app.post("/api/change_password", async (req, res) => {
