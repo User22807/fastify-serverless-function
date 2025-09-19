@@ -8,7 +8,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // Add this at the top, after express.json()
 
-const BASE_URL = "https://superflow.exchange/dev-demo/docs/#/";
+const BASE_URL = "https://superflow.exchange/dev-demo";
 
 // REST API routes
 app.get("/api/ohlcv", async (req, res) => {
