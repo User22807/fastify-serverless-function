@@ -452,6 +452,26 @@ app.post("/api/modify-isolated-balance", async (req, res) => {
   }
 });
 
+// Add this route for klines proxy
+app.get("/api/klines", async (req, res) => {
+  const { symbol = "BTCUSDT", timeframe = "1m", limit = 500 } = req.query;
+  try {
+    const response = await fetch(
+      `${BASE_URL}/klines?symbol=${symbol}&timeframe=${timeframe}&limit=${limit}`,
+      {
+        method: "GET",
+        headers: {
+          accept: "application/json",
+        },
+      }
+    );
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch klines data" });
+  }
+});
+
 // Create an HTTP server
 const server = http.createServer(app);
 
