@@ -453,17 +453,28 @@ app.post("/api/modify-isolated-balance", async (req, res) => {
 });
 
 app.get("/api/klines", async (req, res) => {
-  const { symbol = "BTCUSDT", timeframe = "1m", limit = 500 } = req.query;
+  const {
+    symbol = "BTCUSDT",
+    timeframe = "1m",
+    limit = 500,
+    start_time,
+    end_time,
+  } = req.query;
+
   try {
-    const response = await fetch(
-      `${BASE_URL}/klines?symbol=${symbol}&timeframe=${timeframe}&limit=${limit}`,
-      {
-        method: "GET",
-        headers: {
-          accept: "application/json",
-        },
-      }
-    );
+    const params = new URLSearchParams({
+      symbol,
+      timeframe,
+      limit: String(limit),
+    });
+    if (start_time) params.set("start_time", String(start_time));
+    if (end_time)   params.set("end_time",   String(end_time));
+
+    const response = await fetch(`${BASE_URL}/klines?${params.toString()}`, {
+      method: "GET",
+      headers: { accept: "application/json" },
+    });
+
     const data = await response.json();
     res.status(response.status).json(data);
   } catch (err) {
