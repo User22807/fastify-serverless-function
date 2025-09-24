@@ -12,7 +12,7 @@ const BASE_URL = "https://superflow.exchange/dev-demo";
 
 // REST API routes
 app.get("/api/ohlcv", async (req, res) => {
-  const { symbol = "BTCUSDT", timeframe = 100, limit = 100 } = req.query;
+  const { symbol = "BTCUSDT", timeframe = "1m", limit = 100 } = req.query; // <-- fix here
   try {
     const response = await fetch(
       `${BASE_URL}/ohlcv?symbol=${symbol}&timeframe=${timeframe}&limit=${limit}`
@@ -452,7 +452,6 @@ app.post("/api/modify-isolated-balance", async (req, res) => {
   }
 });
 
-// Add this route for klines proxy
 app.get("/api/klines", async (req, res) => {
   const { symbol = "BTCUSDT", timeframe = "1m", limit = 500 } = req.query;
   try {
