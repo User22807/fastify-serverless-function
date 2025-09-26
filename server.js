@@ -484,6 +484,22 @@ app.get("/api/klines", async (req, res) => {
   }
 });
 
+app.get("/api/siwe/nonce/:accountAddress", async (req, res) => {
+  const { accountAddress } = req.params;
+  try {
+    const response = await fetch(
+      `https://superflow.exchange/dev-demo/siwe/nonce/${accountAddress}`,
+      {
+        method: "GET",
+        headers: { accept: "application/json" },
+      }
+    );
+    res.status(response.status).json(await response.json());
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch SIWE nonce" });
+  }
+});
+
 // Create an HTTP server
 const server = http.createServer(app);
 
