@@ -265,12 +265,14 @@ app.post("/api/order", async (req, res) => {
 app.get("/api/trades", async (req, res) => {
   const { symbol = "BTCUSDT", limit = 100 } = req.query;
   try {
+    const authHeader = req.headers["authorization"];
     const response = await fetch(
       `${BASE_URL}/trades?symbol=${symbol}&limit=${limit}`,
       {
         method: "GET",
         headers: {
           accept: "application/json",
+          Authorization: authHeader,
         },
       }
     );
