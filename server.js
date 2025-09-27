@@ -500,6 +500,40 @@ app.get("/api/siwe/nonce/:accountAddress", async (req, res) => {
   }
 });
 
+app.post("/api/siwe/login", async (req, res) => {
+  try {
+    const response = await fetch("https://superflow.exchange/dev-demo/siwe/login", {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(req.body),
+    });
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to login with SIWE" });
+  }
+});
+
+app.post("/api/siwe/register", async (req, res) => {
+  try {
+    const response = await fetch("https://superflow.exchange/dev-demo/siwe/register", {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(req.body),
+    });
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to register with SIWE" });
+  }
+});
+
 // Create an HTTP server
 const server = http.createServer(app);
 
