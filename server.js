@@ -488,7 +488,7 @@ app.get("/api/siwe/nonce/:accountAddress", async (req, res) => {
   const { accountAddress } = req.params;
   try {
     const response = await fetch(
-      `https://superflow.exchange/dev-demo/siwe/nonce/${accountAddress}`,
+      `${BASE_URL}/siwe/nonce/${accountAddress}`,
       {
         method: "GET",
         headers: { accept: "application/json" },
@@ -502,7 +502,7 @@ app.get("/api/siwe/nonce/:accountAddress", async (req, res) => {
 
 app.post("/api/siwe/login", async (req, res) => {
   try {
-    const response = await fetch("https://superflow.exchange/dev-demo/siwe/login", {
+    const response = await fetch(`${BASE_URL}/siwe/login`, {
       method: "POST",
       headers: {
         accept: "application/json",
@@ -519,7 +519,7 @@ app.post("/api/siwe/login", async (req, res) => {
 
 app.post("/api/siwe/register", async (req, res) => {
   try {
-    const response = await fetch("https://superflow.exchange/dev-demo/siwe/register", {
+    const response = await fetch(`${BASE_URL}/siwe/register`, {
       method: "POST",
       headers: {
         accept: "application/json",
