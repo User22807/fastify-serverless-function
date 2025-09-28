@@ -519,7 +519,6 @@ app.post("/api/siwe/login", async (req, res) => {
 
 app.post("/api/siwe/register", async (req, res) => {
   try {
-    console.log("SIWE Register payload:", req.body); // Log request payload
     const response = await fetch(`${BASE_URL}/siwe/register`, {
       method: "POST",
       headers: {
@@ -528,11 +527,9 @@ app.post("/api/siwe/register", async (req, res) => {
       },
       body: JSON.stringify(req.body),
     });
-    const text = await response.text();
-    console.log("SIWE Register backend response:", response.status, text); // Log backend response
-    res.status(response.status).send(text);
+    const data = await response.json();
+    res.status(response.status).json(data);
   } catch (err) {
-    console.error("Proxy error:", err);
     res.status(500).json({ error: "Failed to register with SIWE" });
   }
 });
