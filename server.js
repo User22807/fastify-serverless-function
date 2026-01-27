@@ -534,6 +534,49 @@ app.post("/api/siwe/register", async (req, res) => {
   }
 });
 
+app.post("/api/my-trades", async (req, res) => {
+  try {
+    const authHeader = req.headers["authorization"];
+    const {
+      orderId = 0,
+      side = "BUY",
+      positionSide = "BOTH",
+      symbol = "BTCUSDT",
+      maker = true,
+      timestampGTE = 0,
+      timestampLTE = 0,
+      start = 0,
+      size = 100
+    } = req.body;
+
+    const url = `${BASE_URL}/my-trades?start=${start}&size=${size}`;
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: authHeader,
+      },
+      body: JSON.stringify({
+        orderId,
+        side,
+        positionSide,
+        symbol,
+        maker,
+        timestampGTE,
+        timestampLTE
+      }),
+    });
+
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (err) {
+    console.error("Error fetching my trades:", err);
+    res.status(500).json({ error: "Failed to fetch my trades" });
+  }
+});
+
 // Create an HTTP server
 const server = http.createServer(app);
 
