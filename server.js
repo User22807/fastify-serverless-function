@@ -537,10 +537,10 @@ app.post("/api/siwe/register", async (req, res) => {
 app.post("/api/my-trades", async (req, res) => {
   try {
     const authHeader = req.headers["authorization"];
-    const {
-    } = req.body;
+    // Get the whole body as-is from the frontend
+    const body = req.body;
 
-    const url = `${BASE_URL}/my-trades?start=${start}&size=${size}`;
+    const url = `${BASE_URL}/my-trades?start=${body.start ?? 0}&size=${body.size ?? 100}`;
 
     const response = await fetch(url, {
       method: "POST",
@@ -549,15 +549,7 @@ app.post("/api/my-trades", async (req, res) => {
         "Content-Type": "application/json",
         Authorization: authHeader,
       },
-      body: JSON.stringify({
-        orderId,
-        side,
-        positionSide,
-        symbol,
-        maker,
-        timestampGTE,
-        timestampLTE
-      }),
+      body: JSON.stringify(body),
     });
 
     const data = await response.json();
