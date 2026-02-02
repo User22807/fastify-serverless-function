@@ -538,15 +538,6 @@ app.post("/api/my-trades", async (req, res) => {
   try {
     const authHeader = req.headers["authorization"];
     const {
-      orderId = 0,
-      side = "BUY",
-      positionSide = "BOTH",
-      symbol = "BTCUSDT",
-      maker = true,
-      timestampGTE = 0,
-      timestampLTE = 0,
-      start = 0,
-      size = 100
     } = req.body;
 
     const url = `${BASE_URL}/my-trades?start=${start}&size=${size}`;
